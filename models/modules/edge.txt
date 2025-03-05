@@ -1,0 +1,47 @@
+class EdgeDetectionModule(nn.Module):
+    def __init__(self):
+        super(EdgeDetectionModule, self).__init__()
+        self.horizontal_conv = nn.Conv2d(in_channels=3, out_channels=1, kernel_size=3, stride=1, padding=1, bias=False)
+        self.vertical_conv = nn.Conv2d(in_channels=3, out_channels=1, kernel_size=3, stride=1, padding=1, bias=False)
+        self.horizontal_conv.weight = nn.Parameter(torch.tensor([[[[-1, -1, -1], 
+                                                                  [-1,  8, -1], 
+                                                                  [-1, -1, -1]]]], dtype=torch.float32))
+        self.vertical_conv.weight = nn.Parameter(torch.tensor([[[[-1, -1, -1], 
+                                                               [-1,  8, -1], 
+                                                               [-1, -1, -1]]]], dtype=torch.float32))
+
+    def forward(self, x):
+        horizontal_edges = self.horizontal_conv(x)
+        vertical_edges = self.vertical_conv(x)
+        edges = torch.abs(horizontal_edges) + torch.abs(vertical_edges)
+        edges = torch.sigmoid(edges)
+        
+        return edges
+
+
+
+class EdgeDetectionModule(nn.Module):
+    def __init__(self):
+        super(EdgeDetectionModule, self).__init__()
+        self.horizontal_conv = nn.Conv2d(in_channels=3, out_channels=1, kernel_size=3, stride=1, padding=1, bias=False)
+        self.vertical_conv = nn.Conv2d(in_channels=3, out_channels=1, kernel_size=3, stride=1, padding=1, bias=False)
+        
+        horizontal_kernel = [[-1, -1, -1],
+                            [-1,  8, -1],
+                            [-1, -1, -1]]
+        vertical_kernel = [[-1, -1, -1],
+                          [-1,  8, -1],
+                          [-1, -1, -1]]
+        
+
+        self.horizontal_conv.weight = nn.Parameter(torch.tensor([horizontal_kernel] * 3).view(3, 1, 3, 3), requires_grad=False)
+        self.vertical_conv.weight = nn.Parameter(torch.tensor([vertical_kernel] * 3).view(3, 1, 3, 3), requires_grad=False)
+
+    def forward(self, x):
+        horizontal_edges = self.horizontal_conv(x)
+        vertical_edges = self.vertical_conv(x)
+        edges = torch.abs(horizontal_edges) + torch.abs(vertical_edges)
+        edges = torch.sigmoid(edges)
+        
+        return edges
+
